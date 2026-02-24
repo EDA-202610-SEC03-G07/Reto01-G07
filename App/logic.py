@@ -151,9 +151,8 @@ def req_2(catalog,min,max):
             if element["price"]>moderno["price"]:
                 moderno=element
             else:
-                
-        
-    
+            pass  
+
 def req_3(catalog):
     """
     Retorna el resultado del requerimiento 3
