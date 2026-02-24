@@ -7,23 +7,39 @@ from DataStructures.Stack import stack as st
 from DataStructures.List import single_linked_list as sl
 csv.field_size_limit(2147483647)
 
+def maximo(lista, criterio):
+    n=lt.size(lista)
+    mayor=None
+    if lt.size(lista)==0:
+        return False
+    else:
+        mayor=lt.first_element(lista)[criterio]
+        for i in range (1,n):
+            if lt.get_element(lista,i)[criterio] > mayor:
+                mayor=lt.get_element(lista,i)[criterio]
+    return mayor
+
+def maximo(lista, criterio):
+    n=lt.size(lista)
+    menor=None
+    if lt.size(lista)==0:
+        return False
+    else:
+        menor=lt.first_element(lista)[criterio]
+        for i in range (1,n):
+            if lt.get_element(lista,i)[criterio] < menor:
+                menor=lt.get_element(lista,i)[criterio]
+    return menor
+    
+            
+
+
+
 def new_logic():
     catalog= {
-        'computadores':None,
-        'Modelos':None,
-        'Marcas':None,
-        'Año':None,
-        'Cpu':None,
-        'Gpu':None,
-        'Precio':None}
+        'computadores':None}
         
     catalog['computadores'] = lt.new_list()
-    catalog['Modelos'] = lt.new_list()
-    catalog['Marcas'] = lt.new_list()
-    catalog['Año'] = lt.new_list()
-    catalog['Cpu'] = lt.new_list()
-    catalog['Gpu'] = lt.new_list()
-    catalog["Precio"] = lt.new_list()
     
     return catalog
     """
@@ -74,8 +90,10 @@ def load_data(catalog):
             llave["warranty_months"]=int(llave["warranty_months"])
             llave["price"]=float(llave["price"])
             lt.add_last(catalog["computadores"],llave)
+            
         menor=lt.get_element(catalog["computadores"],0)
         mayor=lt.get_element(catalog["computadores"],0)
+        
         for i in range(1,lt.size(catalog["computadores"])):
             elemento=lt.get_element(catalog["computadores"],i)
             if elemento["price"]>=mayor["price"]:
@@ -192,6 +210,8 @@ def req_1(catalog, marca):
 
 def req_2(catalog,min,max):
     inicio=get_time()
+    menor_precio=None
+    mayor_precio=None
     moderno=None
     cumplen=0
     suma_ram=0
@@ -199,6 +219,7 @@ def req_2(catalog,min,max):
     suma_precios=0
     filtrados=lt.new_list()
     n=lt.size(catalog["computadores"])
+    
     for i in range(n):
         element=lt.get_element(catalog["computadores"],i)
         if element["price"] <= max and element["price"] >= min:
@@ -207,11 +228,72 @@ def req_2(catalog,min,max):
             suma_precios+=element["price"]
             suma_ram+=element["ram_gb"]
             lt.add_last(filtrados,element)
-        if element["release_year"] == moderno["release_year"]:
-            if element["price"]>moderno["price"]:
-                moderno=element
+            
+            if moderno is None:
+                moderno = element
+            
             else:
-                pass  
+                if element["release_year"] > moderno["release_year"]:
+                    moderno=element
+            
+                elif element["release_year"] == moderno["release_year"] and element["price"] > moderno["price"]:
+                    moderno=element
+                
+            if mayor_precio is None:
+                mayor_precio=element
+            else:
+                if element["price"] > mayor_precio["price"]:
+                    mayor_precio=element
+                    
+            if menor_precio is None:
+                menor_precio=element
+            else:
+                if element["price"] < menor_precio["price"]:
+                    menor_precio=element
+    
+    if cumplen > 0:
+        promedio_ram=suma_ram/cumplen
+        promedio_vram=suma_vram/cumplen
+        promedio_precios=suma_precios/cumplen
+    else:
+        promedio_precios = promedio_ram = promedio_vram =0
+        
+       
+    if menor_precio is not None:   
+        menor_info={"model":menor_precio["model"],
+                  "brand":menor_precio["brand"],
+                  "release_year":menor_precio["release_year"],
+                  "gpu_brand":menor_precio["gpu_brand"],
+                  "cpu_brand":menor_precio["cpu_brand"],
+                  "price":menor_precio["price"]}
+    else: 
+        menor_info=None    
+    
+    if mayor_precio is not None: 
+        mayor_info={"model":mayor_precio["model"],
+                  "brand":mayor_precio["brand"],
+                  "release_year":mayor_precio["release_year"],
+                  "gpu_brand":mayor_precio["gpu_brand"],
+                  "cpu_brand":mayor_precio["cpu_brand"],
+                  "price":mayor_precio["price"]}
+    else: 
+        mayor_info=None   
+    
+    if moderno is not None: 
+        moderno_info={"model":moderno["model"],
+                  "brand":moderno["brand"],
+                  "release_year":moderno["release_year"],
+                  "gpu_brand":moderno["gpu_brand"],
+                  "cpu_brand":moderno["cpu_brand"],
+                  "price":moderno["price"]}  
+    else: 
+        moderno_info=None   
+            
+    final= get_time()
+    tiempo=final-inicio
+    
+    return cumplen, promedio_ram, promedio_vram, promedio_precios, moderno, filtrados, tiempo, moderno_info, menor_info, mayor_info
+                
 
 def req_3(catalog):
     """
@@ -230,7 +312,90 @@ def req_4(catalog):
     pass
 
 
-def req_5(catalog):
+def req_5(catalog,min,max,resolucion,solicitud):
+    filtrados=lt.new_list()
+    inicio=get_time()
+    barato=None
+    caro=None
+    cumplieron=0
+    precio_suma=0
+    resolucion_suma=0
+    gpu_tier_suma=0
+     
+    n=lt.size(catalog["computadores"])
+    
+    for i in range(n):
+        element=lt.get_element(catalog["computadores"],i)
+        
+        if min < element["release_year"] < max and resolucion == element["resolution"]:
+            cumplieron+=1
+            precio_suma+=element["price"]
+            resolucion_suma+=element["display_size_in"]
+            gpu_tier_suma+=element["gpu_tier"]
+            lt.add_last(filtrados,element)
+
+            if barato is None:
+                barato = element
+            else:
+                if element["price"] < barato["price"]:
+                    barato=element
+                    
+            if caro is None:
+                caro=element
+            else:
+                if element["price"] > caro["price"]:
+                    caro=element
+            
+            
+    if cumplieron > 0:
+        precio_promedio=precio_suma/cumplieron
+        promedio_resolucion=resolucion_suma/cumplieron
+        promedio_gpu_tier=gpu_tier_suma/cumplieron
+    else:
+        
+        promedio_gpu_tier = promedio_resolucion = precio_promedio =0    
+        
+    if barato is not None:   
+        barato_info={"price":barato["price"],
+                  "display_size_in":barato["display_size_in"],
+                  "gpu_tier":barato["gpu_tier"],
+                  "display_type":barato["display_type"],
+                  "release_year":barato["release_year"],
+                  "weight_kg":barato["weight_kg"]}
+    else: 
+        barato_info=None    
+        
+    if caro is not None:   
+        caro_info={"price":caro["price"],
+                  "display_size_in":caro["display_size_in"],
+                  "gpu_tier":caro["gpu_tier"],
+                  "display_type":caro["display_type"],
+                  "release_year":caro["release_year"],
+                  "weight_kg":caro["weight_kg"]}
+    else: 
+        caro_info=None   
+    info = None
+    
+    if solicitud.lower() == "barato":
+        info=barato_info
+        
+    if solicitud.lower() =="caro":
+        info=caro_info
+
+    final=get_time()
+    tiempo=final-inicio
+    return tiempo, precio_promedio, promedio_gpu_tier, promedio_resolucion, info, cumplieron
+            
+            
+                
+        
+        
+            
+            
+            
+            
+    
+    
     """
     Retorna el resultado del requerimiento 5
     """
