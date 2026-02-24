@@ -132,7 +132,7 @@ def req_1(catalog):
 
 def req_2(catalog,min,max):
     inicio=get_time()
-    moderno=lt.get_element(catalog["computadores"],0)
+    moderno=None
     cumplen=0
     suma_ram=0
     suma_vram=0
@@ -147,11 +147,25 @@ def req_2(catalog,min,max):
             suma_precios+=element["price"]
             suma_ram+=element["ram_gb"]
             lt.add_last(filtrados,element)
-        if element["release_year"] == moderno["release_year"]:
-            if element["price"]>moderno["price"]:
-                moderno=element
-            else:
-                
+           
+        if moderno == None or element["release_year"] >= moderno["release_year"]:
+            moderno=element
+            
+        if element["release_year"] == moderno["release_year"] and element["price"]>moderno["price"]:
+            moderno=element
+
+
+    if cumplen > 0:
+        promedio_ram=suma_ram/cumplen
+        promedio_vram=suma_vram/cumplen
+        promedio_precios=suma_precios/cumplen
+    else:
+        promedio_precios = promedio_ram = promedio_vram =0
+        
+    final= get_time
+    tiempo=final-inicio
+    
+    return cumplen, promedio_ram, promedio_vram, promedio_precios, moderno, filtrados, tiempo
         
     
 def req_3(catalog):
