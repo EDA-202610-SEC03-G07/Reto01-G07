@@ -1,12 +1,13 @@
 import sys
-
-
+import App.logic as logic
+from tabulate import tabulate
 def new_logic():
     """
         Se crea una instancia del controlador
     """
     #TODO: Llamar la función de la lógica donde se crean las estructuras de datos
-    pass
+    control = logic.new_logic()
+    return control
 
 def print_menu():
     print("Bienvenido")
@@ -24,7 +25,8 @@ def load_data(control):
     Carga los datos
     """
     #TODO: Realizar la carga de datos
-    pass
+    catalog, tiempo, tamaño, menor, mayor, primeros, ultimos = logic.load_data(control)
+    return catalog, tiempo, tamaño, menor, mayor, primeros, ultimos
 
 
 def print_data(control, id):
@@ -34,12 +36,13 @@ def print_data(control, id):
     #TODO: Realizar la función para imprimir un elemento
     pass
 
-def print_req_1(control):
+def print_req_1(control, marca):
     """
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    pass
+    info = logic.req_1(control, marca)
+    print(tabulate(info))
 
 
 def print_req_2(control):
@@ -96,9 +99,11 @@ def main():
         inputs = input('Seleccione una opción para continuar\n')
         if int(inputs) == 0:
             print("Cargando información de los archivos ....\n")
-            data = load_data(control)
+            catalog, tiempo, tamaño, menor, mayor, primeros, ultimos = load_data(control)
+            print(f"Datos cargados en {tiempo} ms\n")
         elif int(inputs) == 1:
-            print_req_1(control)
+            marca = input('Indique la marca\n')
+            print_req_1(control, marca)
 
         elif int(inputs) == 2:
             print_req_2(control)
