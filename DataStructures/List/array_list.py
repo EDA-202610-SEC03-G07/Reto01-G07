@@ -34,7 +34,7 @@ def is_present(my_list, element, comparation_function):
 
 def add_first(lista, element):
     elementos = lista["elements"]
-    elementos.insert(element, 0)
+    elementos.insert(0, element)
     
     lista["size"] += 1
     
@@ -86,7 +86,6 @@ def insert_element(lista, element,pos):
 
 def delete_element(lista,pos):
     
-    print(lista, pos)
     lista["elements"]=lista["elements"][:pos] + lista["elements"][pos+1:]
     
     lista["size"]-=1
@@ -106,5 +105,5 @@ def sub_list(lista, pos_i, num_elements):
         if i < lista["size"]:
             result["elements"].append(lista["elements"][i])
             result["size"] += 1
-        return result
+    return result
 
