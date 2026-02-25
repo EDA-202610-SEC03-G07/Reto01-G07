@@ -265,19 +265,22 @@ def req_2(catalog,min,max):
 
     if moderno:
         info.append(["Más moderno",
-                     f"{moderno['model']} | {moderno['brand']} | "
-                     f"{moderno['release_year']} | "
-                     f"${moderno['price']}"])
+                 f"{moderno['model']} | {moderno['brand']} | "
+                 f"{moderno['release_year']} | "
+                 f"CPU: {moderno['cpu_brand']} | GPU: {moderno['gpu_brand']} | "
+                 f"${moderno['price']}"])
 
     if mayor_precio:
         info.append(["Más caro",
-                     f"{mayor_precio['model']} | {mayor_precio['brand']} | "
-                     f"${mayor_precio['price']}"])
+                 f"{mayor_precio['model']} | {mayor_precio['brand']} | "
+                 f"CPU: {mayor_precio['cpu_brand']} | GPU: {mayor_precio['gpu_brand']} | "
+                 f"${mayor_precio['price']}"])
 
     if menor_precio:
         info.append(["Más barato",
-                     f"{menor_precio['model']} | {menor_precio['brand']} | "
-                     f"${menor_precio['price']}"])
+                 f"{menor_precio['model']} | {menor_precio['brand']} | "
+                 f"CPU: {menor_precio['cpu_brand']} | GPU: {menor_precio['gpu_brand']} | "
+                 f"${menor_precio['price']}"])
 
     return info
                 
@@ -297,9 +300,9 @@ def req_3(catalog,cpu_brand,cpu_tier):
     tamaño = lt.size(catalog["computadores"])    
     
     for i in range(tamaño):
-        computador = lt.getElement(catalog["computadores"], i)
+        computador = lt.get_element(catalog["computadores"], i)
         if computador["cpu_brand"].lower() == cpu_brand.lower() and computador["cpu_tier"].lower() == cpu_tier.lower():
-            lt.addLast(lista_nueva, computador)
+            lt.add_last(lista_nueva, computador)
             suma_precio += computador["price"]
             suma_ram += computador["ram_gb"]
             suma_vram += computador["vram_gb"]
@@ -319,12 +322,12 @@ def req_3(catalog,cpu_brand,cpu_tier):
     numero_computadores= lt.size(lista_nueva) 
     
     for i in range(numero_computadores):
-        computador = lt.getElement(lista_nueva, i)
+        computador = lt.get_element(lista_nueva, i)
         año_actual = computador["release_year"]
         contador_año = 0
         
         for j in range(numero_computadores):
-            computador_año = lt.getElement(lista_nueva, j)
+            computador_año = lt.get_element(lista_nueva, j)
         
             if computador_año["release_year"] == año_actual:
                 contador_año += 1
@@ -337,12 +340,12 @@ def req_3(catalog,cpu_brand,cpu_tier):
     max_frecuencia_gpu = 0
 
     for i in range(numero_computadores):
-        computador = lt.getElement(lista_nueva, i)
+        computador = lt.get_element(lista_nueva, i)
         gpu_actual = computador["gpu_brand"]
         contador_gpu = 0 
     
         for j in range(numero_computadores):
-            computador_gpu = lt.getElement(lista_nueva, j) 
+            computador_gpu = lt.get_element(lista_nueva, j) 
         if computador_gpu["gpu_brand"] == gpu_actual:
             contador_gpu += 1
     if contador_gpu > max_frecuencia_gpu:
