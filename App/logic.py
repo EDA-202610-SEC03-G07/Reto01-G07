@@ -291,7 +291,7 @@ def req_2(catalog,min,max):
             
     final= get_time()
     tiempo=final-inicio
-    
+
     return cumplen, promedio_ram, promedio_vram, promedio_precios, moderno, filtrados, tiempo, moderno_info, menor_info, mayor_info
                 
 
@@ -339,13 +339,18 @@ def req_5(catalog,min,max,resolucion,solicitud):
             else:
                 if element["price"] < barato["price"]:
                     barato=element
+                elif element["price"] == barato["price"]:
+                    if element["weight_kg"] < barato["weight_kg"]:
+                        barato = element
                     
             if caro is None:
                 caro=element
             else:
                 if element["price"] > caro["price"]:
                     caro=element
-            
+                elif element["price"] == caro["price"]:
+                    if element["weight_kg"] < caro["weight_kg"]:
+                        caro = element
             
     if cumplieron > 0:
         precio_promedio=precio_suma/cumplieron
