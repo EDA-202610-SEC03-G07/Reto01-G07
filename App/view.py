@@ -26,7 +26,36 @@ def load_data(control):
     """
     #TODO: Realizar la carga de datos
     catalog, tiempo, tamaño, menor, mayor, primeros, ultimos = logic.load_data(control)
-    return catalog, tiempo, tamaño, menor, mayor, primeros, ultimos
+    info = [
+        ["Tiempo de carga (ms)", tiempo],
+        ["Total registros cargados", tamaño],
+    ]
+
+    if menor:
+        info.append([
+            "Computador más antiguo:",
+            f"{menor['model']} | "
+            f"{menor['brand']} | "
+            f"{menor['release_year']} | "
+            f"${menor['price']}"
+        ])
+
+    if mayor:
+        info.append([
+            "Computador más reciente:",
+            f"{mayor['model']} | "
+            f"{mayor['brand']} | "
+            f"{mayor['release_year']} | "
+            f"${mayor['price']}"
+        ])
+
+    if primeros:
+        info.append(["Primeros registros cargados:", primeros])
+
+    if ultimos:
+        info.append(["Últimos registros cargados:", ultimos])
+
+    return catalog, info
 
 
 def print_data(control, id):
@@ -45,12 +74,13 @@ def print_req_1(control, marca):
     print(tabulate(info))
 
 
-def print_req_2(control):
+def print_req_2(control, min, max):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    info = logic.req_2(control, min, max)
+    print(tabulate(info))
 
 
 def print_req_3(control):
@@ -61,20 +91,22 @@ def print_req_3(control):
     pass
 
 
-def print_req_4(control):
+def print_req_4(control, cpu_brand, gpu_model):
     """
         Función que imprime la solución del Requerimiento 4 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 4
-    pass
+    info = logic.req_4(control, cpu_brand, gpu_model)
+    print(tabulate(info))
 
 
-def print_req_5(control):
+def print_req_5(control, min, max, resolucion,solicitud):
     """
         Función que imprime la solución del Requerimiento 5 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 5
-    pass
+    info = logic.req_5(control, min, max, resolucion,solicitud)
+    print(tabulate(info))
 
 
 def print_req_6(control):
@@ -99,23 +131,32 @@ def main():
         inputs = input('Seleccione una opción para continuar\n')
         if int(inputs) == 0:
             print("Cargando información de los archivos ....\n")
-            catalog, tiempo, tamaño, menor, mayor, primeros, ultimos = load_data(control)
-            print(f"Datos cargados en {tiempo} ms\n")
+            catalog, info= load_data(control)
+            print(tabulate(info))
         elif int(inputs) == 1:
             marca = input('Indique la marca\n')
             print_req_1(control, marca)
 
         elif int(inputs) == 2:
-            print_req_2(control)
+            min = input("Ingrese el precio minimo\n")
+            max = input("Ingrese el precio maximo\n")
+            print_req_2(control, min, max)
 
         elif int(inputs) == 3:
             print_req_3(control)
 
         elif int(inputs) == 4:
-            print_req_4(control)
+            
+            cpu_brand = input('Ingrese la marca de cpu\n')
+            gpu_model = input("Ingrese el modelo de gpu\n")
+            print_req_4(control,cpu_brand, gpu_model)
 
         elif int(inputs) == 5:
-            print_req_5(control)
+            min = input("Ingrese el anio minimo\n")
+            max = input("Ingrese el anio maximo\n")
+            resolucion = input("Ingrese la resolucion de pantalla(widthxheight)\n")
+            solicitud = input("Deseea que sea BARATO o CARO\n")
+            print_req_5(control, min,max,resolucion, solicitud)
 
         elif int(inputs) == 5:
             print_req_6(control)
