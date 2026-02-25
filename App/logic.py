@@ -7,31 +7,16 @@ from DataStructures.Stack import stack as st
 from DataStructures.List import single_linked_list as sl
 csv.field_size_limit(2147483647)
 
-def maximo(lista, criterio):
-    n=lt.size(lista)
-    mayor=None
-    if lt.size(lista)==0:
-        return False
-    else:
-        mayor=lt.first_element(lista)[criterio]
-        for i in range (1,n):
-            if lt.get_element(lista,i)[criterio] > mayor:
-                mayor=lt.get_element(lista,i)[criterio]
-    return mayor
+def maximo(actual, nuevo):
+    if nuevo > actual:
+        return nuevo
+    return actual
 
-def maximo(lista, criterio):
-    n=lt.size(lista)
-    menor=None
-    if lt.size(lista)==0:
-        return False
-    else:
-        menor=lt.first_element(lista)[criterio]
-        for i in range (1,n):
-            if lt.get_element(lista,i)[criterio] < menor:
-                menor=lt.get_element(lista,i)[criterio]
-    return menor
-    
-            
+
+def minimo(actual, nuevo):
+    if nuevo < actual:
+        return nuevo
+    return actual
 
 
 
@@ -160,14 +145,14 @@ def req_1(catalog, marca):
             suma_vram+=comp_act["vram_gb"]
             suma_cores+=comp_act["cpu_cores"]
             suma_anio+=comp_act["release_year"]
-            max_ram = max(max_ram, comp_act["ram_gb"])
-            min_ram = min(min_ram, comp_act["ram_gb"])
-            max_vram = max(max_vram, comp_act["vram_gb"])
-            min_vram = min(min_vram, comp_act["vram_gb"])
-            max_cores = max(max_cores, comp_act["cpu_cores"])
-            min_cores = min(min_cores, comp_act["cpu_cores"])
-            max_anio = max(max_anio, comp_act["release_year"])
-            min_anio = min(min_anio, comp_act["release_year"])
+            max_ram = maximo(max_ram, comp_act["ram_gb"])
+            min_ram = minimo(min_ram, comp_act["ram_gb"])
+            max_vram = maximo(max_vram, comp_act["vram_gb"])
+            min_vram = minimo(min_vram, comp_act["vram_gb"])
+            max_cores = maximo(max_cores, comp_act["cpu_cores"])
+            min_cores = minimo(min_cores, comp_act["cpu_cores"])
+            max_anio = maximo(max_anio, comp_act["release_year"])
+            min_anio = minimo(min_anio, comp_act["release_year"])
             if computador_caro is None:
                 computador_caro = comp_act
             else:
@@ -184,9 +169,10 @@ def req_1(catalog, marca):
                 elif comp_act["price"] == computador_barato["price"]:
                     if comp_act["weight_kg"] < computador_barato["weight_kg"]:
                         computador_barato = comp_act
-    tiempo_final = get_time()
-    tiempo = delta_time(tiempo_inicio, tiempo_final)
+    
     if cantidad == 0:
+        tiempo_final = get_time()
+        tiempo = delta_time(tiempo_inicio, tiempo_final)
         return [["Mensaje", "No se encontraron computadores para la marca: " + marca],
                 ["Tiempo ejecución (ms)", tiempo]]
     prom_precio = suma_precio/cantidad
@@ -194,7 +180,8 @@ def req_1(catalog, marca):
     prom_vram = suma_vram/cantidad
     prom_cores= suma_cores/cantidad
     prom_anio = suma_anio/cantidad
-        
+    tiempo_final = get_time()
+    tiempo = delta_time(tiempo_inicio, tiempo_final)
     info = [["Tiempo ejecucion (ms):", tiempo], 
             ["Cantidad de Computadores: ", cantidad],
             ["Precio (Promedio, Min, Max):", f"${round(prom_precio,2)} / ${computador_barato['price']} / ${computador_caro['price']}"], 
@@ -217,6 +204,8 @@ def req_2(catalog,min,max):
     suma_ram=0
     suma_vram=0
     suma_precios=0
+    min = float(min)
+    max = float(max)
     filtrados=lt.new_list()
     n=lt.size(catalog["computadores"])
     
@@ -250,49 +239,47 @@ def req_2(catalog,min,max):
             else:
                 if element["price"] < menor_precio["price"]:
                     menor_precio=element
-    
-    if cumplen > 0:
-        promedio_ram=suma_ram/cumplen
-        promedio_vram=suma_vram/cumplen
-        promedio_precios=suma_precios/cumplen
-    else:
-        promedio_precios = promedio_ram = promedio_vram =0
-        
-       
-    if menor_precio is not None:   
-        menor_info={"model":menor_precio["model"],
-                  "brand":menor_precio["brand"],
-                  "release_year":menor_precio["release_year"],
-                  "gpu_brand":menor_precio["gpu_brand"],
-                  "cpu_brand":menor_precio["cpu_brand"],
-                  "price":menor_precio["price"]}
-    else: 
-        menor_info=None    
-    
-    if mayor_precio is not None: 
-        mayor_info={"model":mayor_precio["model"],
-                  "brand":mayor_precio["brand"],
-                  "release_year":mayor_precio["release_year"],
-                  "gpu_brand":mayor_precio["gpu_brand"],
-                  "cpu_brand":mayor_precio["cpu_brand"],
-                  "price":mayor_precio["price"]}
-    else: 
-        mayor_info=None   
-    
-    if moderno is not None: 
-        moderno_info={"model":moderno["model"],
-                  "brand":moderno["brand"],
-                  "release_year":moderno["release_year"],
-                  "gpu_brand":moderno["gpu_brand"],
-                  "cpu_brand":moderno["cpu_brand"],
-                  "price":moderno["price"]}  
-    else: 
-        moderno_info=None   
-            
-    final= get_time()
-    tiempo=final-inicio
+    if cumplen == 0:
+        final = get_time()
+        tiempo = delta_time(inicio, final)
 
-    return cumplen, promedio_ram, promedio_vram, promedio_precios, moderno, filtrados, tiempo, moderno_info, menor_info, mayor_info
+        return [
+            ["Mensaje", f"No se encontraron computadores en el rango {min} - {max}"],
+            ["Tiempo ejecución (ms)", tiempo]
+        ]
+
+    promedio_ram = suma_ram / cumplen
+    promedio_vram = suma_vram / cumplen
+    promedio_precios = suma_precios / cumplen
+
+    final = get_time()
+    tiempo = delta_time(inicio, final)
+
+    info = [
+        ["Tiempo ejecución (ms)", tiempo],
+        ["Cantidad", cumplen],
+        ["Precio promedio", round(promedio_precios, 2)],
+        ["RAM promedio", round(promedio_ram)],
+        ["VRAM promedio", round(promedio_vram)],
+    ]
+
+    if moderno:
+        info.append(["Más moderno",
+                     f"{moderno['model']} | {moderno['brand']} | "
+                     f"{moderno['release_year']} | "
+                     f"${moderno['price']}"])
+
+    if mayor_precio:
+        info.append(["Más caro",
+                     f"{mayor_precio['model']} | {mayor_precio['brand']} | "
+                     f"${mayor_precio['price']}"])
+
+    if menor_precio:
+        info.append(["Más barato",
+                     f"{menor_precio['model']} | {menor_precio['brand']} | "
+                     f"${menor_precio['price']}"])
+
+    return info
                 
 
 def req_3(catalog,cpu_brand,cpu_tier):
@@ -310,7 +297,7 @@ def req_3(catalog,cpu_brand,cpu_tier):
     tamaño = lt.size(catalog["computadores"])    
     
     for i in range(tamaño):
-        computador = lt.get_element(catalog["computadores"], i)
+        computador = lt.getElement(catalog["computadores"], i)
         if computador["cpu_brand"].lower() == cpu_brand.lower() and computador["cpu_tier"].lower() == cpu_tier.lower():
             lt.addLast(lista_nueva, computador)
             suma_precio += computador["price"]
@@ -332,12 +319,12 @@ def req_3(catalog,cpu_brand,cpu_tier):
     numero_computadores= lt.size(lista_nueva) 
     
     for i in range(numero_computadores):
-        computador = lt.get_element(lista_nueva, i)
+        computador = lt.getElement(lista_nueva, i)
         año_actual = computador["release_year"]
         contador_año = 0
         
         for j in range(numero_computadores):
-            computador_año = lt.get_element(lista_nueva, j)
+            computador_año = lt.getElement(lista_nueva, j)
         
             if computador_año["release_year"] == año_actual:
                 contador_año += 1
@@ -350,12 +337,12 @@ def req_3(catalog,cpu_brand,cpu_tier):
     max_frecuencia_gpu = 0
 
     for i in range(numero_computadores):
-        computador = lt.get_element(lista_nueva, i)
+        computador = lt.getElement(lista_nueva, i)
         gpu_actual = computador["gpu_brand"]
         contador_gpu = 0 
     
         for j in range(numero_computadores):
-            computador_gpu = lt.get_element(lista_nueva, j) 
+            computador_gpu = lt.getElement(lista_nueva, j) 
         if computador_gpu["gpu_brand"] == gpu_actual:
             contador_gpu += 1
     if contador_gpu > max_frecuencia_gpu:
@@ -366,18 +353,97 @@ def req_3(catalog,cpu_brand,cpu_tier):
         tiempo = final-inicio
         
     return  (contador,prom_precio,prom_ram,prom_vram,prom_hilos,año_frecuente,gpu_frecuente,tiempo)
+        
+        
+
+        
+            
 
 
-
-def req_4(catalog):
+def req_4(catalog, cpu_brand, gpu_model):
     """
     Retorna el resultado del requerimiento 4
     """
     # TODO: Modificar el requerimiento 4
-    pass
+    tiempo_inicio = get_time()
+    
+    cantidad, suma_precio, suma_vram, suma_ram, suma_boost = 0,0,0,0,0
+    prom_precio, prom_vram, prom_ram, prob_boost_cpu = 0,0,0,0
+    mas_caro1 = None
+    mas_caro2 = None
+    lista_filtrada = filtrar_por_cpubrand_gpumodel(catalog,gpu_model, cpu_brand)
+    actual = lista_filtrada["first"]
+    cantidad = sl.size(lista_filtrada)
+    if cantidad == 0:
+        tiempo_final = get_time()
+        tiempo = delta_time(tiempo_inicio, tiempo_final)
+        return [["Mensaje", "No se encontraron computadores que cumplan el filtro de cpu: "+ cpu_brand+" y gpu: " + gpu_model],
+                ["Tiempo ejecución (ms)", tiempo]]
+    while actual != None:
+        comp_act = actual["info"]
+        suma_precio += comp_act["price"]
+        suma_vram += comp_act["vram_gb"]
+        suma_ram += comp_act["ram_gb"]
+        suma_boost += comp_act["cpu_boost_ghz"]
+        
+        if mas_caro1 is None:
+            mas_caro1 = comp_act
+
+        elif (comp_act["price"] > mas_caro1["price"] or
+              (comp_act["price"] == mas_caro1["price"] and
+              comp_act["weight_kg"] < mas_caro1["weight_kg"])):
+
+            mas_caro2 = mas_caro1
+            mas_caro1 = comp_act
+
+        elif mas_caro2 is None:
+
+            mas_caro2 = comp_act
+
+        elif (comp_act["price"] > mas_caro2["price"] or
+              (comp_act["price"] == mas_caro2["price"] and
+              comp_act["weight_kg"] < mas_caro2["weight_kg"])):
+            mas_caro2 = comp_act
+
+        actual = actual["next"]
+    prom_precio = suma_precio/cantidad
+    prom_vram = suma_vram/cantidad
+    prom_ram = suma_ram/cantidad
+    prob_boost_cpu = suma_boost/cantidad
+    tiempo_final = get_time()
+    tiempo = delta_time(tiempo_inicio, tiempo_final)
+    
+    info = [
+        ["Tiempo ejecución (ms)", tiempo],
+        ["Cantidad", cantidad],
+        ["Precio promedio", round(prom_precio, 2)],
+        ["VRAM promedio (GB)", round(prom_vram)],
+        ["RAM promedio (GB)", round(prom_ram)],
+        ["Boost promedio (GHz)", round(prob_boost_cpu, 2)],
+    ]
+
+    if mas_caro1:
+        info.append(["Computadora mas costosa 1:",
+                     f"{mas_caro1['model']} | {mas_caro1['brand']} | "
+                     f"{mas_caro1['release_year']} | "
+                     f"{mas_caro1['cpu_model']} | "
+                     f"${mas_caro1['price']}"])
+
+    if mas_caro2:
+        info.append(["Computadora mas costosa 2:",
+                     f"{mas_caro2['model']} | {mas_caro2['brand']} | "
+                     f"{mas_caro2['release_year']} | "
+                     f"{mas_caro2['cpu_model']} | "
+                     f"${mas_caro2['price']}"])
+
+    return info
 
 
 def req_5(catalog,min,max,resolucion,solicitud):
+    """
+    Retorna el resultado del requerimiento 5
+    """
+    # TODO: Modificar el requerimiento 5
     filtrados=lt.new_list()
     inicio=get_time()
     barato=None
@@ -386,6 +452,8 @@ def req_5(catalog,min,max,resolucion,solicitud):
     precio_suma=0
     resolucion_suma=0
     gpu_tier_suma=0
+    min = int(min)
+    max = int(max)
      
     n=lt.size(catalog["computadores"])
     
@@ -406,7 +474,7 @@ def req_5(catalog,min,max,resolucion,solicitud):
                     barato=element
                 elif element["price"] == barato["price"]:
                     if element["weight_kg"] < barato["weight_kg"]:
-                        barato = element
+                        barato=element
                     
             if caro is None:
                 caro=element
@@ -415,7 +483,7 @@ def req_5(catalog,min,max,resolucion,solicitud):
                     caro=element
                 elif element["price"] == caro["price"]:
                     if element["weight_kg"] < caro["weight_kg"]:
-                        caro = element
+                        caro=element
             
     if cumplieron > 0:
         precio_promedio=precio_suma/cumplieron
@@ -426,7 +494,8 @@ def req_5(catalog,min,max,resolucion,solicitud):
         promedio_gpu_tier = promedio_resolucion = precio_promedio =0    
         
     if barato is not None:   
-        barato_info={"price":barato["price"],
+        barato_info={"brand":caro["brand"],"model":caro["model"],
+                  "price":barato["price"],
                   "display_size_in":barato["display_size_in"],
                   "gpu_tier":barato["gpu_tier"],
                   "display_type":barato["display_type"],
@@ -436,7 +505,8 @@ def req_5(catalog,min,max,resolucion,solicitud):
         barato_info=None    
         
     if caro is not None:   
-        caro_info={"price":caro["price"],
+        caro_info={"brand":caro["brand"],"model":caro["model"],
+                  "price":caro["price"],
                   "display_size_in":caro["display_size_in"],
                   "gpu_tier":caro["gpu_tier"],
                   "display_type":caro["display_type"],
@@ -454,23 +524,30 @@ def req_5(catalog,min,max,resolucion,solicitud):
 
     final=get_time()
     tiempo=final-inicio
-    return tiempo, precio_promedio, promedio_gpu_tier, promedio_resolucion, info, cumplieron
-            
-            
-                
-        
-        
-            
-            
-            
-            
-    
-    
-    """
-    Retorna el resultado del requerimiento 5
-    """
-    # TODO: Modificar el requerimiento 5
-    pass
+    resultado = [
+        ["Tiempo ejecución (ms)", tiempo],
+        ["Filtro de selección", solicitud.upper()],
+        ["Cantidad", cumplieron],
+        ["Precio promedio", round(precio_promedio, 2)],
+        ["GPU tier promedio", round(promedio_gpu_tier, 2)],
+        ["Tamaño pantalla promedio", round(promedio_resolucion, 2)],
+    ]
+
+    if info:
+        resultado.append([
+            f"Más {solicitud.lower()}:",
+            f"{info['brand']} | "
+            f"{info['model']} | "
+            f"${info['price']} | "
+            f"{info['display_size_in']} in | "
+            f"GPU Tier {info['gpu_tier']} | "
+            f"Tipo {info['display_type']} | "
+            f"Año {info['release_year']} | "
+            f"Peso {info['weight_kg']} kg"
+        ])
+
+    return resultado
+
 
 def req_6(catalog):
     """
@@ -495,3 +572,15 @@ def delta_time(start, end):
     """
     elapsed = float(end - start)
     return elapsed
+
+
+def filtrar_por_cpubrand_gpumodel(lista, criterio1, criterio2):
+    lista_filtrada = sl.new_list()
+    tamanio = lt.size(lista["computadores"])
+    
+    for i in range(tamanio):
+        comp_act = lt.get_element(lista["computadores"], i)
+        if (comp_act['gpu_model'].lower() == criterio1 and
+        comp_act["cpu_brand"].lower() == criterio2.lower()):
+            sl.add_last(lista_filtrada, comp_act)
+    return lista_filtrada
