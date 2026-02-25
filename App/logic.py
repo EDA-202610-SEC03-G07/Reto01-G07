@@ -295,13 +295,82 @@ def req_2(catalog,min,max):
     return cumplen, promedio_ram, promedio_vram, promedio_precios, moderno, filtrados, tiempo, moderno_info, menor_info, mayor_info
                 
 
-def req_3(catalog):
+def req_3(catalog,cpu_brand,cpu_tier):
     """
     Retorna el resultado del requerimiento 3
     """
     # TODO: Modificar el requerimiento 3
-    pass
+    inicio = get_time() 
+    lista_nueva = lt.new_list()
+    suma_precio = 0
+    suma_ram = 0
+    suma_vram = 0
+    suma_hilos = 0
+    contador = 0
+    tamaño = lt.size(catalog["computadores"])    
+    
+    for i in range(tamaño):
+        computador = lt.getElement(catalog["computadores"], i)
+        if computador["cpu_brand"].lower() == cpu_brand.lower() and computador["cpu_tier"].lower() == cpu_tier.lower():
+            lt.addLast(lista_nueva, computador)
+            suma_precio += computador["price"]
+            suma_ram += computador["ram_gb"]
+            suma_vram += computador["vram_gb"]
+            suma_hilos += computador["cpu_threads"]
+            contador += 1
+            
+    if contador == 0:
+        return [["Mensaje", "No se encontraron computadores para la marca: " + cpu_brand + " y el tier: " + cpu_tier]]
+    
+    prom_precio = suma_precio / contador
+    prom_ram = suma_ram / contador
+    prom_vram = suma_vram / contador
+    prom_hilos = suma_hilos / contador
+    
+    año_frecuente = 0 
+    max_frecuencia = 0
+    numero_computadores= lt.size(lista_nueva) 
+    
+    for i in range(numero_computadores):
+        computador = lt.getElement(lista_nueva, i)
+        año_actual = computador["release_year"]
+        contador_año = 0
+        
+        for j in range(numero_computadores):
+            computador_año = lt.getElement(lista_nueva, j)
+        
+            if computador_año["release_year"] == año_actual:
+                contador_año += 1
+            
+        if contador_año > max_frecuencia:
+            max_frecuencia = contador_año
+            año_frecuente = año_actual 
+            
+    gpu_frecuente = 0 
+    max_frecuencia_gpu = 0
 
+    for i in range(numero_computadores):
+        computador = lt.getElement(lista_nueva, i)
+        gpu_actual = computador["gpu_brand"]
+        contador_gpu = 0 
+    
+        for j in range(numero_computadores):
+            computador_gpu = lt.getElement(lista_nueva, j) 
+        if computador_gpu["gpu_brand"] == gpu_actual:
+            contador_gpu += 1
+    if contador_gpu > max_frecuencia_gpu:
+        max_frecuencia_gpu = contador_gpu
+        gpu_frecuente = gpu_actual
+        
+        final = get_time()
+        tiempo = final-inicio
+        
+    return  (contador,prom_precio,prom_ram,prom_vram,prom_hilos,año_frecuente,gpu_frecuente,tiempo)
+        
+        
+
+        
+            
 
 
 def req_4(catalog):
