@@ -638,7 +638,7 @@ def req_6(catalog, año_inicial, año_final):
     tiempo = final - inicio
     
     
-    return tiempo, registros, os_mas_usado, max_cantidad, os_mas_recauda, max_recaudo, resultados_por_os
+    return tiempo, registros, os_mas_usado, cantidad, os_mas_recauda, max_recaudo, resultados_por_os
     
 # Funciones para medir tiempos de ejecucion
 
