@@ -1,4 +1,6 @@
 import csv
+from logging import info
+from logging import info
 import os
 import time
 from DataStructures.List import array_list as lt
@@ -353,9 +355,19 @@ def req_3(catalog,cpu_brand,cpu_tier):
         gpu_frecuente = gpu_actual
         
         final = get_time()
-        tiempo = final-inicio
+        tiempo = delta_time(inicio, final)
         
-    return  (contador,prom_precio,prom_ram,prom_vram,prom_hilos,año_frecuente,gpu_frecuente,tiempo)
+        info =[
+    ["Computadores encontrados", contador],
+    ["Precio promedio", round(prom_precio, 2)],
+    ["RAM promedio (GB)", round(prom_ram, 2)],
+    ["VRAM promedio (GB)", round(prom_vram, 2)],
+    ["Hilos promedio CPU", round(prom_hilos, 2)],
+    ["Año más frecuente", año_frecuente],
+    ["GPU más frecuente", gpu_frecuente],
+    ["Tiempo de ejecución (ms)", round(tiempo, 2)]]
+        
+    return info     
         
         
 
@@ -567,16 +579,16 @@ def req_6(catalog, año_inicial, año_final):
     os_mas_recauda = None
     max_recaudo = 0
 
-    tamaño = lt.size(catalog["computadores"])
+    tamaño = sl.size(catalog["computadores"])
     for i in range(tamaño):
-        elemento = lt.getElement(catalog["computadores"], i)
+        elemento = sl.get_element(catalog["computadores"], i)
         if elemento["release_year"] >= año_inicial and elemento["release_year"] <= año_final:
             sl.add_last(lista_nueva, elemento)
             registros += 1 
         
         
     tamaño_nueva = sl.size(lista_nueva)
-    resultados_por_os = sl.newList()
+    resultados_por_os = sl.new_List()
     for i in range (1, sl.size(lista_nueva)+1):
         elemento = sl.get_element(lista_nueva, i)
         os_actual = elemento["os"]
@@ -638,7 +650,16 @@ def req_6(catalog, año_inicial, año_final):
     tiempo = final - inicio
     
     
-    return tiempo, registros, os_mas_usado, cantidad, os_mas_recauda, max_recaudo, resultados_por_os
+    info = [
+    ["Tiempo de ejecución ", round(tiempo, 2)],
+    ["registros en rango", registros],
+    ["os más usado", os_mas_usado],
+    ["Cantidad del OS más usado", cantidad],
+    ["OS con mayor recaudo", os_mas_recauda],
+    ["Recaudo máximo", (max_recaudo, 2)]
+]
+
+    return info , resultados_por_os
     
 # Funciones para medir tiempos de ejecucion
 
