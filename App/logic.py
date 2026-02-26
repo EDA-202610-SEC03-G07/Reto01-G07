@@ -552,14 +552,94 @@ def req_5(catalog,min,max,resolucion,solicitud):
     return resultado
 
 
-def req_6(catalog):
+def req_6(catalog, año_inicial, año_final):
     """
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
     pass
+    inicio = get_time()
 
+    lista_nueva = sl.new_list()
+    registros = 0 
+    os_usado = None
+    cantidad = 0 
+    os_mas_recauda = None
+    max_recaudo = 0
 
+    tamaño = lt.size(catalog["computadores"])
+    for i in range(tamaño):
+        elemento = lt.getElement(catalog["computadores"], i)
+        if elemento["release_year"] >= año_inicial and elemento["release_year"] <= año_final:
+            sl.add_last(lista_nueva, elemento)
+            registros += 1 
+        
+        
+    tamaño_nueva = sl.size(lista_nueva)
+    resultados_por_os = sl.newList()
+    for i in range (1, sl.size(lista_nueva)+1):
+        elemento = sl.get_element(lista_nueva, i)
+        os_actual = elemento["os"]
+    
+        cantidad_os = 0
+        recaudo_os = 0
+        suma_peso = 0 
+    
+        precio_min = 99999999
+        precio_max = 0 
+    
+        barato = None 
+        caro = None
+        for j in range(1, tamaño_nueva + 1):
+            elementoj = sl.get_element(lista_nueva, j)
+
+            if elementoj["os"] == os_actual:
+                cantidad_os += 1
+                precio = float(elementoj["price"])
+                
+                peso = float(elementoj["weight"])
+            
+                recaudo_os += precio
+                
+                suma_peso += peso
+            
+                if precio < precio_min:
+                    precio_min = precio
+                    barato = elementoj
+
+                if precio > precio_max:
+                    precio_max = precio
+                    caro = elementoj
+                
+        if cantidad_os > cantidad:
+            cantidad = cantidad_os
+            os_mas_usado = os_actual
+
+        if recaudo_os > max_recaudo:
+            max_recaudo = recaudo_os
+            os_mas_recauda = os_actual
+        
+        precio_promedio = recaudo_os / cantidad_os
+        peso_promedio = suma_peso / cantidad_os
+    
+        info_os = {
+            "os": os_actual,
+            "cantidad": cantidad_os,
+            "recaudo": recaudo_os,
+            "precio_promedio": precio_promedio,
+            "peso_promedio": peso_promedio,
+            "mas_caro": caro,
+            "mas_barato": barato
+            }
+
+        sl.addLast(resultados_por_os, info_os)
+    
+    final = get_time()
+    tiempo = final - inicio
+    
+    
+    return tiempo, registros, os_mas_usado, max_cantidad, os_mas_recauda, max_recaudo, resultados_por_os
+    
 # Funciones para medir tiempos de ejecucion
 
 def get_time():
