@@ -83,12 +83,14 @@ def print_req_2(control, min, max):
     print(tabulate(info))
 
 
-def print_req_3(control):
+def print_req_3(control, cpu_brand, cpu_tier):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    info = logic.req_3(control, cpu_brand, cpu_tier)
+    print(tabulate(info))
+    
 
 
 def print_req_4(control, cpu_brand, gpu_model):
@@ -109,12 +111,13 @@ def print_req_5(control, min, max, resolucion,solicitud):
     print(tabulate(info))
 
 
-def print_req_6(control):
+def print_req_6(control, año_inicial, año_final):
     """
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    info = logic.req_6(control, año_inicial, año_final)
+    print(tabulate(info))
 
 # Se crea la lógica asociado a la vista
 control = new_logic()
