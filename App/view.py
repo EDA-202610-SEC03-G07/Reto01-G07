@@ -146,7 +146,9 @@ def main():
             print_req_2(control, min, max)
 
         elif int(inputs) == 3:
-            print_req_3(control)
+            cpu_brand = input("Ingrese la marca del CPU: ")
+            cpu_tier = input("Ingrese el tier del CPU: ")
+            print_req_3(control, cpu_brand, cpu_tier)
 
         elif int(inputs) == 4:
             
@@ -161,8 +163,10 @@ def main():
             solicitud = input("Deseea que sea BARATO o CARO\n")
             print_req_5(control, min,max,resolucion, solicitud)
 
-        elif int(inputs) == 5:
-            print_req_6(control)
+        elif int(inputs) == 6:
+            inicial = int(input("Ingrese el anio inicial\n"))
+            final = int(input("Ingrese el anio final\n"))
+            print_req_6(control, inicial,final)
 
         elif int(inputs) == 7:
             working = False

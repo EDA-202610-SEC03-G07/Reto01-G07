@@ -287,93 +287,114 @@ def req_2(catalog,min,max):
     return info
                 
 
-def req_3(catalog,cpu_brand,cpu_tier):
+def req_3(catalog, cpu_brand, cpu_tier):
     """
     Retorna el resultado del requerimiento 3
     """
-    # TODO: Modificar el requerimiento 3
-    inicio = get_time() 
+    inicio = get_time()
     lista_nueva = lt.new_list()
+    años_lista = lt.new_list()
+    conteos_años = lt.new_list()
+    gpus_lista = lt.new_list()
+    conteos_gpus = lt.new_list()
     suma_precio = 0
     suma_ram = 0
     suma_vram = 0
     suma_hilos = 0
     contador = 0
-    tamaño = lt.size(catalog["computadores"])    
-    
+    año_frecuente = 0
+    max_frecuencia = 0
+    gpu_frecuente = None
+    max_frecuencia_gpu = 0
+    año_actual = 0
+    gpu_actual = None
+    numero_computadores = 0
+    prom_precio = 0
+    prom_ram = 0
+    prom_vram = 0
+    prom_hilos = 0
+    encontrado = False
+    nuevo_conteo = 0
+
+    tamaño = lt.size(catalog["computadores"])
     for i in range(tamaño):
         computador = lt.get_element(catalog["computadores"], i)
-        if computador["cpu_brand"].lower() == cpu_brand.lower() and computador["cpu_tier"].lower() == cpu_tier.lower():
+        if (computador["cpu_brand"].lower() == cpu_brand.lower() and
+           computador["cpu_tier"] == int(cpu_tier)):
             lt.add_last(lista_nueva, computador)
             suma_precio += computador["price"]
             suma_ram += computador["ram_gb"]
             suma_vram += computador["vram_gb"]
             suma_hilos += computador["cpu_threads"]
             contador += 1
-            
-    if contador == 0:
-        return [["Mensaje", "No se encontraron computadores para la marca: " + cpu_brand + " y el tier: " + cpu_tier]]
+
     
+
+    if contador == 0:
+        final = get_time()
+        tiempo = delta_time(inicio, final)
+        return [["Mensaje", "No se encontraron computadores para la marca: " + cpu_brand + " y el tier: " + cpu_tier],
+                ["Tiempo ejecución (ms)", tiempo]]
+
     prom_precio = suma_precio / contador
     prom_ram = suma_ram / contador
     prom_vram = suma_vram / contador
     prom_hilos = suma_hilos / contador
-    
-    año_frecuente = 0 
-    max_frecuencia = 0
-    numero_computadores= lt.size(lista_nueva) 
-    
+    numero_computadores = lt.size(lista_nueva)
+
     for i in range(numero_computadores):
         computador = lt.get_element(lista_nueva, i)
         año_actual = computador["release_year"]
-        contador_año = 0
-        
-        for j in range(numero_computadores):
-            computador_año = lt.get_element(lista_nueva, j)
-        
-            if computador_año["release_year"] == año_actual:
-                contador_año += 1
-            
-        if contador_año > max_frecuencia:
-            max_frecuencia = contador_año
-            año_frecuente = año_actual 
-            
-    gpu_frecuente = 0 
-    max_frecuencia_gpu = 0
+        encontrado = False
+        for j in range(lt.size(años_lista)):
+            if lt.get_element(años_lista, j) == año_actual:
+                nuevo_conteo = lt.get_element(conteos_años, j) + 1
+                lt.change_info(conteos_años, j, nuevo_conteo)
+                if nuevo_conteo > max_frecuencia:
+                    max_frecuencia = nuevo_conteo
+                    año_frecuente = año_actual
+                encontrado = True
+                break
+        if not encontrado:
+            lt.add_last(años_lista, año_actual)
+            lt.add_last(conteos_años, 1)
+            if 1 > max_frecuencia:
+                max_frecuencia = 1
+                año_frecuente = año_actual
 
+   
     for i in range(numero_computadores):
         computador = lt.get_element(lista_nueva, i)
         gpu_actual = computador["gpu_brand"]
-        contador_gpu = 0 
-    
-        for j in range(numero_computadores):
-            computador_gpu = lt.get_element(lista_nueva, j) 
-        if computador_gpu["gpu_brand"] == gpu_actual:
-            contador_gpu += 1
-    if contador_gpu > max_frecuencia_gpu:
-        max_frecuencia_gpu = contador_gpu
-        gpu_frecuente = gpu_actual
-        
-        final = get_time()
-        tiempo = delta_time(inicio, final)
-        
-        info =[
-    ["Computadores encontrados", contador],
-    ["Precio promedio", round(prom_precio, 2)],
-    ["RAM promedio (GB)", round(prom_ram, 2)],
-    ["VRAM promedio (GB)", round(prom_vram, 2)],
-    ["Hilos promedio CPU", round(prom_hilos, 2)],
-    ["Año más frecuente", año_frecuente],
-    ["GPU más frecuente", gpu_frecuente],
-    ["Tiempo de ejecución (ms)", round(tiempo, 2)]]
-        
-    return info     
-        
-        
-
-        
-            
-
+        encontrado = False
+        for j in range(lt.size(gpus_lista)):
+            if lt.get_element(gpus_lista, j) == gpu_actual:
+                nuevo_conteo = lt.get_element(conteos_gpus, j) + 1
+                lt.change_info(conteos_gpus, j, nuevo_conteo)
+                if nuevo_conteo > max_frecuencia_gpu:
+                    max_frecuencia_gpu = nuevo_conteo
+                    gpu_frecuente = gpu_actual
+                encontrado = True
+                break
+        if not encontrado:
+            lt.add_last(gpus_lista, gpu_actual)
+            lt.add_last(conteos_gpus, 1)
+            if 1 > max_frecuencia_gpu:
+                max_frecuencia_gpu = 1
+                gpu_frecuente = gpu_actual
+    final = get_time()
+    tiempo = delta_time(inicio, final)
+    info = [
+        ["Tiempo ejecución (ms)", round(tiempo, 2)],
+        ["Computadores encontrados", contador],
+        ["Precio promedio", round(prom_precio, 2)],
+        ["RAM promedio (GB)", round(prom_ram, 2)],
+        ["VRAM promedio (GB)", round(prom_vram, 2)],
+        ["Hilos promedio CPU", round(prom_hilos, 2)],
+        ["Año más frecuente", año_frecuente],
+        ["GPU más frecuente", gpu_frecuente],
+    ]
+    return info
 
 def req_4(catalog, cpu_brand, gpu_model):
     """
@@ -568,98 +589,135 @@ def req_6(catalog, año_inicial, año_final):
     """
     Retorna el resultado del requerimiento 6
     """
-    # TODO: Modificar el requerimiento 6
-    pass
-    inicio = get_time()
-
-    lista_nueva = sl.new_list()
-    registros = 0 
-    os_usado = None
-    cantidad = 0 
-    os_mas_recauda = None
+    tiempo_inicio = get_time()
+    lista_filtrada = sl.new_list()
+    os_unicos = sl.new_list()
+    resultados_por_os = sl.new_list()
+    cantidad_total = 0
+    os_mas_usado = None
+    os_mayor_recaudo = None
+    max_cantidad = 0
     max_recaudo = 0
-
-    tamaño = sl.size(catalog["computadores"])
-    for i in range(tamaño):
-        elemento = sl.get_element(catalog["computadores"], i)
-        if elemento["release_year"] >= año_inicial and elemento["release_year"] <= año_final:
-            sl.add_last(lista_nueva, elemento)
-            registros += 1 
-        
-        
-    tamaño_nueva = sl.size(lista_nueva)
-    resultados_por_os = sl.new_List()
-    for i in range (1, sl.size(lista_nueva)+1):
-        elemento = sl.get_element(lista_nueva, i)
-        os_actual = elemento["os"]
+    max_cantidad_recaudo = 0
+    cantidad_os = 0
+    suma_precio = 0
+    suma_peso = 0
+    mas_caro = None
+    mas_barato = None
+    precio = 0
+    peso = 0
+    info_os = None
+    encontrado = False
+    os_actual = None
     
+    for i in range(lt.size(catalog["computadores"])):
+        comp = lt.get_element(catalog["computadores"], i)
+        if año_inicial <= comp["release_year"] <= año_final:
+            sl.add_last(lista_filtrada, comp)
+
+    cantidad_total = sl.size(lista_filtrada)
+
+    if cantidad_total == 0:
+        tiempo_final = get_time()
+        tiempo = delta_time(tiempo_inicio, tiempo_final)
+        return [["Mensaje", f"No se encontraron computadores entre {año_inicial} y {año_final}"],
+                ["Tiempo ejecución (ms)", tiempo]]
+
+    actual = lista_filtrada["first"]
+    while actual is not None:
+        os_actual = actual["info"]["os"]
+        encontrado = False
+        nodo_os = os_unicos["first"]
+        while nodo_os is not None:
+            if nodo_os["info"] == os_actual:
+                encontrado = True
+                break
+            nodo_os = nodo_os["next"]
+        if not encontrado:
+            sl.add_last(os_unicos, os_actual)
+        actual = actual["next"]
+
+ 
+    nodo_os = os_unicos["first"]
+    while nodo_os is not None:
+        os_actual = nodo_os["info"]
         cantidad_os = 0
-        recaudo_os = 0
-        suma_peso = 0 
-    
-        precio_min = 99999999
-        precio_max = 0 
-    
-        barato = None 
-        caro = None
-        for j in range(1, tamaño_nueva + 1):
-            elementoj = sl.get_element(lista_nueva, j)
+        suma_precio = 0
+        suma_peso = 0
+        mas_caro = None
+        mas_barato = None
 
-            if elementoj["os"] == os_actual:
+        actual = lista_filtrada["first"]
+        while actual is not None:
+            comp = actual["info"]
+            if comp["os"] == os_actual:
                 cantidad_os += 1
-                precio = float(elementoj["price"])
-                
-                peso = float(elementoj["weight"])
-            
-                recaudo_os += precio
-                
+                precio = comp["price"]
+                peso = comp["weight_kg"]
+                suma_precio += precio
                 suma_peso += peso
-            
-                if precio < precio_min:
-                    precio_min = precio
-                    barato = elementoj
 
-                if precio > precio_max:
-                    precio_max = precio
-                    caro = elementoj
-                
-        if cantidad_os > cantidad:
-            cantidad = cantidad_os
+                if mas_caro is None or precio > mas_caro["price"] or \
+                   (precio == mas_caro["price"] and peso < mas_caro["weight_kg"]):
+                    mas_caro = comp
+                if mas_barato is None or precio < mas_barato["price"] or \
+                   (precio == mas_barato["price"] and peso < mas_barato["weight_kg"]):
+                    mas_barato = comp
+            actual = actual["next"]
+
+        if cantidad_os > max_cantidad:
+            max_cantidad = cantidad_os
             os_mas_usado = os_actual
+        if suma_precio > max_recaudo:
+            max_recaudo = suma_precio
+            os_mayor_recaudo = os_actual
+            max_cantidad_recaudo = cantidad_os
 
-        if recaudo_os > max_recaudo:
-            max_recaudo = recaudo_os
-            os_mas_recauda = os_actual
-        
-        precio_promedio = recaudo_os / cantidad_os
-        peso_promedio = suma_peso / cantidad_os
-    
         info_os = {
             "os": os_actual,
             "cantidad": cantidad_os,
-            "recaudo": recaudo_os,
-            "precio_promedio": precio_promedio,
-            "peso_promedio": peso_promedio,
-            "mas_caro": caro,
-            "mas_barato": barato
-            }
+            "recaudo": round(suma_precio, 2),
+            "precio_promedio": round(suma_precio / cantidad_os, 2),
+            "peso_promedio": round(suma_peso / cantidad_os, 2),
+            "mas_caro": mas_caro,
+            "mas_barato": mas_barato
+        }
+        sl.add_last(resultados_por_os, info_os)
+        nodo_os = nodo_os["next"]
 
-        sl.addLast(resultados_por_os, info_os)
-    
-    final = get_time()
-    tiempo = final - inicio
-    
-    
+    tiempo_final = get_time()
+    tiempo = delta_time(tiempo_inicio, tiempo_final)
+
     info = [
-    ["Tiempo de ejecución ", round(tiempo, 2)],
-    ["registros en rango", registros],
-    ["os más usado", os_mas_usado],
-    ["Cantidad del OS más usado", cantidad],
-    ["OS con mayor recaudo", os_mas_recauda],
-    ["Recaudo máximo", (max_recaudo, 2)]
-]
+        ["Tiempo ejecución (ms)", round(tiempo, 2)],
+        ["Total computadores en rango", cantidad_total],
+        ["OS más usado", os_mas_usado],
+        ["  Cantidad de registros", max_cantidad],
+        ["  Recaudo total", round(max_recaudo, 2)],
+        ["OS mayor recaudo", os_mayor_recaudo],
+        ["  Cantidad de registros", max_cantidad_recaudo],
+        ["  Recaudo total", round(max_recaudo, 2)],
+    ]
 
-    return info , resultados_por_os
+    nodo = resultados_por_os["first"]
+    while nodo is not None:
+        datos = nodo["info"]
+        info.append([f"--- OS: {datos['os']} ---", ""])
+        info.append(["  Precio promedio", datos["precio_promedio"]])
+        info.append(["  Peso promedio (kg)", datos["peso_promedio"]])
+        if datos["mas_caro"]:
+            c = datos["mas_caro"]
+            info.append(["  Más costoso",
+                         f"{c['model']} | {c['brand']} | {c['release_year']} | "
+                         f"{c['cpu_model']} | {c['gpu_model']} | ${c['price']}"])
+        if datos["mas_barato"]:
+            b = datos["mas_barato"]
+            info.append(["  Más barato",
+                         f"{b['model']} | {b['brand']} | {b['release_year']} | "
+                         f"{b['cpu_model']} | {b['gpu_model']} | ${b['price']}"])
+        nodo = nodo["next"]
+
+    return info
     
 # Funciones para medir tiempos de ejecucion
 
